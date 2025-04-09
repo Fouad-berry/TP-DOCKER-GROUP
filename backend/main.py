@@ -4,11 +4,11 @@ import pandas as pd
 app = FastAPI()
 
 df = pd.read_csv("lycees.csv", on_bad_lines="skip", sep=";")
-donnees = df.to_dict(orient="records")
+donnees = df.fillna("").to_dict(orient="records")
 
 @app.get("/")
 def home():
-    return {"message": "Bienvenue sur l’API des lycées numériques"}
+    return {"message du Groupe TP-DOCKER-GROUP": "Bienvenue sur l’API des lycées numériques ; ajoutez un /docs pour visualiser le contenu"}
 
 @app.get("/donnees")
 def get_all():
@@ -26,3 +26,4 @@ def get_filtre(region: str = None):
         results = [d for d in donnees if str(d.get("region", "")).lower() == region.lower()]
         return results
     return {"message": "Utilise ?region=NomDeLaRégion"}
+

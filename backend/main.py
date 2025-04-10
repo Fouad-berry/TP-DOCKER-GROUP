@@ -3,6 +3,9 @@ import pandas as pd
 from mongo import collection
 from bson import ObjectId  # Import pour gérer les _id MongoDB
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import HTTPException
+from bson.objectid import ObjectId
+
 
 app = FastAPI()
 
@@ -87,3 +90,14 @@ def reload_csv():
     collection.insert_many(data)
     return {"status": "MongoDB vidé et rechargé avec lycees.csv ✅"}
 
+@app.get("/donnees/by_id/{lycee_id}")
+def get_lycee_by_id(lycee_id: str, source: str = "mongo"):
+    try:
+        if source == "csv":
+            return {"error": "Accès par ID uniquement disponible en mode MongoDB"}
+        lycee = collection.find_one({"_id": ObjectId(lycee_id)})
+        if lycee:
+            return serialize_doc(lycee)
+        raise HTTPException(status_code=404, detail="Lycée introuvable")
+    except Exception as e:
+        return {"error": str(e)}
